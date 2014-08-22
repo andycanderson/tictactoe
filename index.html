@@ -1,10 +1,47 @@
 <!DOCTYPE html>
-<html>
-<head>
-	<title>T Rex Toe</title>
-</head>
-<body>
+<html ng-app="tRexToe">
+  <head>
+    <title>TRexToe</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/angular.js"></script>
+    <script src="js/main.js"></script>
+  </head>
+  <body>
+      <div ng-controller="boardController" id="container">
+          <h1>T Rex Toe</h1>
+          <h3 ng-bind="itsyourturn"></h3>
+      <div
+       ng-repeat="row in board" class="clear"
+       >
+          <div 
+          ng-repeat="col in row track by $index"
+          ng-class="{
+          cell:true,
+          borderbottom: $parent.$index!==2,
+          borderleft: $index!=0,
+          dino: board[$parent.$index][$index]==1,
+          toe: board[$parent.$index][$index]==2
+          }"
+          ng-click="setPic($parent.$index, $index)"
+          ></div>
+
+      </div>
 
 
+      <br>
+      <div>{{board}}</div>
+      
+<!--      <div ng-bind="input | capitalize"></div>
+     <div>{{"hello" | capitalize}}</div>
+     <div>{{-10 | abs}}</div>
+     <input type="text" ng-model="words">
+     <div ng-bind="words | everyothercaps"></div>
+    <div>{{"hello" | everyothercaps}}</div> -->
+    <!-- filters -->
 
-</body>
+
+    
+    </div>
+  </body>
+</html>
