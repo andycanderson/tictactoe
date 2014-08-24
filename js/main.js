@@ -1,26 +1,41 @@
 var app = angular.module('tRexToe', []);
 
 app.controller('boardController', ['$scope', function($scope){
-	$scope.board = [["","",""],["","",""],["","",""]];
+	
+	$scope.scoreKeeper=[0,0];
+	$scope.initiate = false;
 	$scope.player= 1;
 	$scope.itsyourturn = "Player 1's turn";
-	$scope.winCondition1 = "111";
-	$scope.winCondition2 = "222";
-	$scope.boardSize = 3;
-	$scope.setPic = function(x, y){
-		// add && for win condition
+	
+	$scope.setupBoard = function(){
+		var x = this.range;
+		var board=[];
+		for(i=0; i<x; i++)
+		{
+			board[i]=[];
+			for(j=0; j<x; j++)
+			{
+				board[i][j]="";
+			}
+		}
+		$scope.board = board;
+		$scope.initiate = true;	
+		$scope.winCondition1 = getWinCondition(1);
+		$scope.winCondition2 = getWinCondition(2);
+	};
 
+	$scope.setPic = function(x, y){
 		if ($scope.board[x][y]==="" && !checkWinner() && !tie())
 		{
 			$scope.board[x][y]=$scope.player;
 			if (!checkWinner() && !tie()) 
 			{
-				set_piece_change_turn();
+				placePieceChangeTurn();
 			}
 		}
 	};
 
-	function set_piece_change_turn(){
+	function placePieceChangeTurn(){
 		$scope.player===2 ? $scope.player-=1 : $scope.player+=1;
 		$scope.player===1 ? $scope.itsyourturn = "Player 1's turn" : $scope.itsyourturn = "Player 2's turn";
 	};
@@ -35,11 +50,12 @@ app.controller('boardController', ['$scope', function($scope){
 
 	// east west
 	function ew(){
-		for(i=0; i<$scope.boardSize; i++)
+		for(i=0; i<$scope.board.length; i++)
 		{
-			var flatten = $scope.board[i].toString();
-			var nocommas = flatten.replace(/,/g , "");
-			if (nocommas === $scope.winCondition1 || nocommas === $scope.winCondition2)
+
+			var row = removeCommas(flatten($scope.board[i]));
+			console.log("this row "+row);
+			if (row === $scope.winCondition1 || row === $scope.winCondition2)
 			{
 				return true;
 			}
@@ -82,7 +98,7 @@ app.controller('boardController', ['$scope', function($scope){
 		var diagonal=[];
 		for(i=0; i<$scope.board.length;i++)
 		{
-			var x = scope.board.length-1-i;
+			var x = $scope.board.length-1-i;
 			diagonal.push($scope.board[i][x]);
 
 		}
@@ -94,7 +110,6 @@ app.controller('boardController', ['$scope', function($scope){
 	};
 
 	function tie(){
-		var total_spaces = $scope.board.length*$scope.board.length;
 		var result; 
 		for(i = 0; i<$scope.board.length; i++)
 		{
@@ -113,12 +128,13 @@ app.controller('boardController', ['$scope', function($scope){
 		return result; 
 	};
 
-	function getWinCondition(size){
-		for (i = 0; i < size; i++)
+	function getWinCondition(player){
+		var x = "";
+		for (i = 0; i < $scope.board.length; i++)
 		{
-			$scope.winCondition1+="1";
-			$scope.winCondition2+="2";
+			x+=player.toString();
 		}
+		return x;
 	};
 
 	function flatten(x){

@@ -9,16 +9,24 @@
   </head>
   <body>
       <div ng-controller="boardController" id="container">
+
+        <!-- size of board -->
+        <form ng-submit="setupBoard()">
+          <input type="number" name="range" ng-model="range" min="3" max="7">
+          <input type="submit">
+        </form>
+
+
           <h1>T Rex Toe</h1>
           <h3 ng-bind="itsyourturn"></h3>
       <div
-       ng-repeat="row in board" class="clear"
+        ng-show="initiate" ng-repeat="row in board" class="clear"
        >
           <div 
           ng-repeat="col in row track by $index"
           ng-class="{
           cell:true,
-          borderbottom: $parent.$index!==2,
+          borderbottom: $parent.$index!=(range-1),
           borderleft: $index!=0,
           dino: board[$parent.$index][$index]==1,
           toe: board[$parent.$index][$index]==2
@@ -29,18 +37,11 @@
       </div>
 
 
-      <br>
+     <!--  <br>
       <div>{{board}}</div>
       <br>
-      <div>{{players_current_locations}}</div>
+      <div>{{players_current_locations}}</div> -->
       
-<!--      <div ng-bind="input | capitalize"></div>
-     <div>{{"hello" | capitalize}}</div>
-     <div>{{-10 | abs}}</div>
-     <input type="text" ng-model="words">
-     <div ng-bind="words | everyothercaps"></div>
-    <div>{{"hello" | everyothercaps}}</div> -->
-    <!-- filters -->
 
 
 
