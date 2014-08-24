@@ -4,32 +4,36 @@ app.controller('boardController', ['$scope', function($scope){
 	$scope.board = [["","",""],["","",""],["","",""]];
 	$scope.player= 1;
 	$scope.itsyourturn = "Player 1's turn";
-	$scope.winCondition1 = "";
-	$scope.winCondition2 = "";
+	$scope.winCondition1 = "111";
+	$scope.winCondition2 = "222";
 	$scope.boardSize = 3;
 	$scope.setPic = function(x, y){
 		// add && for win condition
+
 		if ($scope.board[x][y]==="" && !checkWinner() && !tie())
 		{
 			$scope.board[x][y]=$scope.player;
-			console.log(tie());
-			$scope.player===2 ? $scope.player-=1 : $scope.player+=1;
-			$scope.player===1 ? $scope.itsyourturn = "Player 1's turn" : $scope.itsyourturn = "Player 2's turn";
+			if (!checkWinner() && !tie()) 
+			{
+				set_piece_change_turn();
+			}
 		}
+	};
+
+	function set_piece_change_turn(){
+		$scope.player===2 ? $scope.player-=1 : $scope.player+=1;
+		$scope.player===1 ? $scope.itsyourturn = "Player 1's turn" : $scope.itsyourturn = "Player 2's turn";
 	};
 
 	// setup logic to test the diff positions
 	function checkWinner(){
 
 		var result = false;
-		result = ew() || ns(boardSize) || senw() || swne();
-		console.log(result);
+		result = ew() || ns() || senw() || swne();
 		return result;
 	};
 
-
-
-	// <->
+	// east west
 	function ew(){
 		for(i=0; i<$scope.boardSize; i++)
 		{
@@ -41,112 +45,51 @@ app.controller('boardController', ['$scope', function($scope){
 			}
 		}
 	};	
-
-	// |
-	function ns(boardSize){
-		var col1 = [];
-		var col2 = [];
-		var col3 = [];
-		for(i=0; i<$scope.board.length;i++)
+	// north south
+	function ns(){
+		for(i = 0; i<$scope.board.length; i++)
 		{
-			for(j=0; j<$scope.board.length;j++)
+			var playerPieces="";
+			for(j = 0; j<$scope.board.length; j++)
 			{
-				if (j === 0)
+				if($scope.board[j][i]===$scope.player)
 				{
-					col1.push($scope.board[i][j]);
-				}
-				else if (j ===1)
-				{
-					col2.push($scope.board[i][j]);
-				}
-				else
-				{
-					col3.push($scope.board[i][j]);
+					playerPieces=playerPieces+$scope.player.toString();
 				}
 			}
-		}
-		// col1,2,3, to string
-		// col1,2,3, remove commas
-		col1=removeCommas(flatten(col1));
-		col2=removeCommas(flatten(col2));
-		col3=removeCommas(flatten(col3));
-		
-		
-		if(col1===$scope.winCondition1 || col1 ===$scope.winCondition2 || col2===$scope.winCondition1 || col2===$scope.winCondition2 || col3===$scope.winCondition1 || col3===$scope.winCondition2)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
+			if(playerPieces===$scope.winCondition1 || playerPieces===$scope.winCondition2)
+			{
+				return true;
+			}
 		}
 	};
-	function checkColumn(boardSize){
-		return checkColumn(boardSize-1);
-	};
-
-
-	// \
+	// diagonal \
 	function senw(){
 		var diagonal=[];
 		for(i=0; i<$scope.board.length;i++)
 		{
-			for(j=0; j<$scope.board.length;j++)
-			{
-				if (i === 0 && j===0)
-				{
-					diagonal.push($scope.board[i][j]);
-				}
-				else if (i===1 && j === 1)
-				{
-					diagonal.push($scope.board[i][j]);
-				}
-				else if(i===2 && j ===2)
-				{
-					diagonal.push($scope.board[i][j]);
-				}
-			}
+			diagonal.push($scope.board[i][i]);
 		}
 		diagonal = removeCommas(flatten(diagonal));
 		if(diagonal===$scope.winCondition1 || diagonal===$scope.winCondition2)
 		{
 			return true;
 		}
-		else
-		{
-			return false;
-		}
 	};
 	
-	// /
+	// diagonal /
 	function swne(){
 		var diagonal=[];
 		for(i=0; i<$scope.board.length;i++)
 		{
-			for(j=0; j<$scope.board.length;j++)
-			{
-				if (i === 0 && j===2)
-				{
-					diagonal.push($scope.board[i][j]);
-				}
-				else if (i===1 && j === 1)
-				{
-					diagonal.push($scope.board[i][j]);
-				}
-				else if(i===2 && j ===0)
-				{
-					diagonal.push($scope.board[i][j]);
-				}
-			}
+			var x = scope.board.length-1-i;
+			diagonal.push($scope.board[i][x]);
+
 		}
 		diagonal = removeCommas(flatten(diagonal));
 		if(diagonal===$scope.winCondition1 || diagonal===$scope.winCondition2)
 		{
 			return true;
-		}
-		else
-		{
-			return false;
 		}
 	};
 
