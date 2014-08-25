@@ -1,6 +1,6 @@
 .cell{
-	width:100px;
-	height:100px;
+	width:200px;
+	height:200px;
 	display:inline-block;
 	float:left;
 }
@@ -16,16 +16,16 @@
 
 #container{
 	margin:0 auto;
-	max-width: 630px;
+	max-width: 800px;
 }
 .dino{
-	background-image: url('../images/trex.png');
+	background-image: url('../images/dino.png');
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-position: center;
 }
 .toe{
-	background-image: url('../images/toe.png');
+	background-image: url('../images/datoe.png');
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-position: center;

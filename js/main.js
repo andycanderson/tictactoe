@@ -5,10 +5,14 @@ app.controller('boardController', ['$scope', function($scope){
 	$scope.scoreKeeper=[0,0];
 	$scope.initiate = false;
 	$scope.player= 1;
-	$scope.itsyourturn = "Player 1's turn";
+	$scope.end_game;
+	$scope.over = false;
+
 	
 	$scope.setupBoard = function(){
 		var x = this.range;
+		$scope.playerOne =  this.playerOne || "Player 1";
+		$scope.playerTwo = this.playerTwo || "Player 2";
 		var board=[];
 		for(i=0; i<x; i++)
 		{
@@ -19,7 +23,8 @@ app.controller('boardController', ['$scope', function($scope){
 			}
 		}
 		$scope.board = board;
-		$scope.initiate = true;	
+		$scope.initiate = true;
+		$scope.itsyourturn = $scope.playerOne+"'s turn";	
 		$scope.winCondition1 = getWinCondition(1);
 		$scope.winCondition2 = getWinCondition(2);
 	};
@@ -32,12 +37,22 @@ app.controller('boardController', ['$scope', function($scope){
 			{
 				placePieceChangeTurn();
 			}
+			else if (checkWinner())
+			{
+				$scope.end_game = $scope.player === 1 ? $scope.playerOne + " wins!" : $scope.playerTwo + " wins!";
+				$scope.over = true;
+			}
+			else
+			{
+				$scope.end_game = "Tie.";
+				$scope.over = true;
+			}
 		}
 	};
 
 	function placePieceChangeTurn(){
 		$scope.player===2 ? $scope.player-=1 : $scope.player+=1;
-		$scope.player===1 ? $scope.itsyourturn = "Player 1's turn" : $scope.itsyourturn = "Player 2's turn";
+		$scope.player===1 ? $scope.itsyourturn = $scope.playerOne+"'s turn" : $scope.itsyourturn = $scope.playerTwo+"'s turn";
 	};
 
 	// setup logic to test the diff positions
@@ -54,7 +69,6 @@ app.controller('boardController', ['$scope', function($scope){
 		{
 
 			var row = removeCommas(flatten($scope.board[i]));
-			console.log("this row "+row);
 			if (row === $scope.winCondition1 || row === $scope.winCondition2)
 			{
 				return true;
