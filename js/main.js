@@ -1,18 +1,24 @@
-var app = angular.module('tRexToe', []);
+var app = angular.module('tRexToe', ["firebase"]);
 
-app.controller('boardController', ['$scope', function($scope){
+app.controller('boardController', ['$scope','$firebase', function($scope, $firebase){
 	
-	$scope.scoreKeeper=[0,0];
-	$scope.initiate = false;
-	$scope.player= 1;
-	$scope.end_game;
-	$scope.over = false;
+	$scope.gameboard = {};
+	$scope.gameboard.scoreKeeper=[0,0];
+	$scope.gameboard.initiate = false;
+	$scope.gameboard.player= 1;
+	$scope.gameboard.end_game;
+	$scope.gameboard.over = false;
 
 	
+	$scope.playAgain = function (){
+		$scope.gameboard.over = false;
+		$scope.gameboard.initiate = false;
+	};
+
 	$scope.setupBoard = function(){
 		var x = this.range;
-		$scope.playerOne =  this.playerOne || "Player 1";
-		$scope.playerTwo = this.playerTwo || "Player 2";
+		$scope.gameboard.playerOne =  this.playerOne || "Player 1";
+		$scope.gameboard.playerTwo = this.playerTwo || "Player 2";
 		var board=[];
 		for(i=0; i<x; i++)
 		{
@@ -22,37 +28,42 @@ app.controller('boardController', ['$scope', function($scope){
 				board[i][j]="";
 			}
 		}
-		$scope.board = board;
-		$scope.initiate = true;
-		$scope.itsyourturn = $scope.playerOne+"'s turn";	
-		$scope.winCondition1 = getWinCondition(1);
-		$scope.winCondition2 = getWinCondition(2);
+		$scope.gameboard.board = board;
+		var databaseBoard = $firebase(new Firebase("https://trextoe.firebaseio.com/data"));
+		databaseBoard.$bind($scope,"gameboard");
+
+
+		$scope.gameboard.initiate = true;
+		console.log($scope.gameboard.initiate);
+		$scope.gameboard.itsyourturn = $scope.gameboard.playerOne+"'s turn";	
+		$scope.gameboard.winCondition1 = getWinCondition(1);
+		$scope.gameboard.winCondition2 = getWinCondition(2);
 	};
 
 	$scope.setPic = function(x, y){
-		if ($scope.board[x][y]==="" && !checkWinner() && !tie())
+		if ($scope.gameboard.board[x][y]==="" && !checkWinner() && !tie())
 		{
-			$scope.board[x][y]=$scope.player;
+			$scope.gameboard.board[x][y]=$scope.gameboard.player;
 			if (!checkWinner() && !tie()) 
 			{
 				placePieceChangeTurn();
 			}
 			else if (checkWinner())
 			{
-				$scope.end_game = $scope.player === 1 ? $scope.playerOne + " wins!" : $scope.playerTwo + " wins!";
-				$scope.over = true;
+				$scope.gameboard.end_game = $scope.gameboard.player === 1 ? $scope.gameboard.playerOne + " wins!" : $scope.gameboard.playerTwo + " wins!";
+				$scope.gameboard.over = true;
 			}
 			else
 			{
-				$scope.end_game = "Tie.";
-				$scope.over = true;
+				$scope.gameboard.end_game = "Tie.";
+				$scope.gameboard.over = true;
 			}
 		}
 	};
 
 	function placePieceChangeTurn(){
-		$scope.player===2 ? $scope.player-=1 : $scope.player+=1;
-		$scope.player===1 ? $scope.itsyourturn = $scope.playerOne+"'s turn" : $scope.itsyourturn = $scope.playerTwo+"'s turn";
+		$scope.gameboard.player===2 ? $scope.gameboard.player-=1 : $scope.gameboard.player+=1;
+		$scope.gameboard.player===1 ? $scope.gameboard.itsyourturn = $scope.gameboard.playerOne+"'s turn" : $scope.gameboard.itsyourturn = $scope.gameboard.playerTwo+"'s turn";
 	};
 
 	// setup logic to test the diff positions
@@ -65,11 +76,11 @@ app.controller('boardController', ['$scope', function($scope){
 
 	// east west
 	function ew(){
-		for(i=0; i<$scope.board.length; i++)
+		for(i=0; i<$scope.gameboard.board.length; i++)
 		{
 
-			var row = removeCommas(flatten($scope.board[i]));
-			if (row === $scope.winCondition1 || row === $scope.winCondition2)
+			var row = removeCommas(flatten($scope.gameboard.board[i]));
+			if (row === $scope.gameboard.winCondition1 || row === $scope.gameboard.winCondition2)
 			{
 				return true;
 			}
@@ -77,17 +88,17 @@ app.controller('boardController', ['$scope', function($scope){
 	};	
 	// north south
 	function ns(){
-		for(i = 0; i<$scope.board.length; i++)
+		for(i = 0; i<$scope.gameboard.board.length; i++)
 		{
 			var playerPieces="";
-			for(j = 0; j<$scope.board.length; j++)
+			for(j = 0; j<$scope.gameboard.board.length; j++)
 			{
-				if($scope.board[j][i]===$scope.player)
+				if($scope.gameboard.board[j][i]===$scope.gameboard.player)
 				{
-					playerPieces=playerPieces+$scope.player.toString();
+					playerPieces=playerPieces+$scope.gameboard.player.toString();
 				}
 			}
-			if(playerPieces===$scope.winCondition1 || playerPieces===$scope.winCondition2)
+			if(playerPieces===$scope.gameboard.winCondition1 || playerPieces===$scope.gameboard.winCondition2)
 			{
 				return true;
 			}
@@ -96,12 +107,12 @@ app.controller('boardController', ['$scope', function($scope){
 	// diagonal \
 	function senw(){
 		var diagonal=[];
-		for(i=0; i<$scope.board.length;i++)
+		for(i=0; i<$scope.gameboard.board.length;i++)
 		{
-			diagonal.push($scope.board[i][i]);
+			diagonal.push($scope.gameboard.board[i][i]);
 		}
 		diagonal = removeCommas(flatten(diagonal));
-		if(diagonal===$scope.winCondition1 || diagonal===$scope.winCondition2)
+		if(diagonal===$scope.gameboard.winCondition1 || diagonal===$scope.gameboard.winCondition2)
 		{
 			return true;
 		}
@@ -110,14 +121,14 @@ app.controller('boardController', ['$scope', function($scope){
 	// diagonal /
 	function swne(){
 		var diagonal=[];
-		for(i=0; i<$scope.board.length;i++)
+		for(i=0; i<$scope.gameboard.board.length;i++)
 		{
-			var x = $scope.board.length-1-i;
-			diagonal.push($scope.board[i][x]);
+			var x = $scope.gameboard.board.length-1-i;
+			diagonal.push($scope.gameboard.board[i][x]);
 
 		}
 		diagonal = removeCommas(flatten(diagonal));
-		if(diagonal===$scope.winCondition1 || diagonal===$scope.winCondition2)
+		if(diagonal===$scope.gameboard.winCondition1 || diagonal===$scope.gameboard.winCondition2)
 		{
 			return true;
 		}
@@ -125,11 +136,11 @@ app.controller('boardController', ['$scope', function($scope){
 
 	function tie(){
 		var result; 
-		for(i = 0; i<$scope.board.length; i++)
+		for(i = 0; i<$scope.gameboard.board.length; i++)
 		{
-			for(j=0; j<$scope.board.length; j++)
+			for(j=0; j<$scope.gameboard.board.length; j++)
 			{
-				if($scope.board[i][j]==="")
+				if($scope.gameboard.board[i][j]==="")
 				{
 					return false;
 				}
@@ -144,7 +155,7 @@ app.controller('boardController', ['$scope', function($scope){
 
 	function getWinCondition(player){
 		var x = "";
-		for (i = 0; i < $scope.board.length; i++)
+		for (i = 0; i < $scope.gameboard.board.length; i++)
 		{
 			x+=player.toString();
 		}
