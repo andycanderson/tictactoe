@@ -15,8 +15,8 @@
         <!-- size of board -->
         <form ng-submit="setupBoard()">
           <div ng-hide="gameboard.initiate">
-          <label>Boardsize:</label>
-          <input type="number" name="range" ng-model="range" min="3" max="7">
+          <!-- <label>Boardsize:</label>
+          <input type="number" name="range" ng-model="range" min="3" max="7"> -->
           <label>Player 1:</label>
           <input type="text" ng-model="playerOne" value="Player 1">
           <label>Player 2:</label>
@@ -26,13 +26,15 @@
         </form>
 
 
-          <h1>{{playerOne}}</h1>
-          <h1>{{playerTwo}}</h1>
+          <h3 ng-bind="gameboard.playerOne"><br></h3>
+          <h3 ng-bind="gameboard.scoreKeeper[0]"></h3>
+          <h3 ng-bind="gameboard.playerTwo"><br></h3>
+          <h3 ng-bind="gameboard.scoreKeeper[1]"></h3>
 
           <h1>T Rex Toe</h1>
           <h3 ng-bind="gameboard.itsyourturn"></h3>
           <div ng-show="gameboard.over" ng-bind="gameboard.end_game"></div>
-          <div ng-click="playAgain()">play again?</div>
+          <div ng-show="gameboard.over"ng-click="playAgain(); setupBoard()">play again?</div>
       
       
       <div

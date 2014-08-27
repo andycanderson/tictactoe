@@ -16,7 +16,8 @@ app.controller('boardController', ['$scope','$firebase', function($scope, $fireb
 	};
 
 	$scope.setupBoard = function(){
-		var x = this.range;
+		// var x = this.range;
+		var x = 3;
 		$scope.gameboard.playerOne =  this.playerOne || "Player 1";
 		$scope.gameboard.playerTwo = this.playerTwo || "Player 2";
 		var board=[];
@@ -52,6 +53,7 @@ app.controller('boardController', ['$scope','$firebase', function($scope, $fireb
 			{
 				$scope.gameboard.end_game = $scope.gameboard.player === 1 ? $scope.gameboard.playerOne + " wins!" : $scope.gameboard.playerTwo + " wins!";
 				$scope.gameboard.over = true;
+				$scope.gameboard.scoreKeeper[$scope.gameboard.player-1]+=1;
 			}
 			else
 			{
