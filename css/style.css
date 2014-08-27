@@ -1,6 +1,6 @@
 .cell{
-	width:100px;
-	height:100px;
+	width:200px;
+	height:200px;
 	display:inline-block;
 	float:left;
 }
@@ -29,6 +29,9 @@
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-position: center;
+}
+.winner{
+	background-color: red;
 }
 h1{
 	font-family: helvetica;

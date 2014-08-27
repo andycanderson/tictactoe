@@ -8,18 +8,20 @@ app.controller('boardController', ['$scope','$firebase', function($scope, $fireb
 	$scope.gameboard.player= 1;
 	$scope.gameboard.end_game;
 	$scope.gameboard.over = false;
+	$scope.gameboard.swc = [["","",""],["","",""],["","",""]];
 
 	
 	$scope.playAgain = function (){
 		$scope.gameboard.over = false;
 		$scope.gameboard.initiate = false;
+		$scope.gameboard.swc = [["","",""],["","",""],["","",""]];
 	};
 
 	$scope.setupBoard = function(){
 		// var x = this.range;
 		var x = 3;
-		$scope.gameboard.playerOne =  this.playerOne || "Player 1";
-		$scope.gameboard.playerTwo = this.playerTwo || "Player 2";
+		$scope.gameboard.playerOne = $scope.gameboard.playerOne || "Player 1";
+		$scope.gameboard.playerTwo = $scope.gameboard.playerTwo || "Player 2";
 		var board=[];
 		for(i=0; i<x; i++)
 		{
@@ -32,10 +34,7 @@ app.controller('boardController', ['$scope','$firebase', function($scope, $fireb
 		$scope.gameboard.board = board;
 		var databaseBoard = $firebase(new Firebase("https://trextoe.firebaseio.com/data"));
 		databaseBoard.$bind($scope,"gameboard");
-
-
 		$scope.gameboard.initiate = true;
-		console.log($scope.gameboard.initiate);
 		$scope.gameboard.itsyourturn = $scope.gameboard.playerOne+"'s turn";	
 		$scope.gameboard.winCondition1 = getWinCondition(1);
 		$scope.gameboard.winCondition2 = getWinCondition(2);
@@ -73,6 +72,7 @@ app.controller('boardController', ['$scope','$firebase', function($scope, $fireb
 
 		var result = false;
 		result = ew() || ns() || senw() || swne();
+
 		return result;
 	};
 
@@ -84,12 +84,17 @@ app.controller('boardController', ['$scope','$firebase', function($scope, $fireb
 			var row = removeCommas(flatten($scope.gameboard.board[i]));
 			if (row === $scope.gameboard.winCondition1 || row === $scope.gameboard.winCondition2)
 			{
+				for(k = 0; k<$scope.gameboard.board.length; k++)
+				{
+					$scope.gameboard.swc[i][k]=1;
+				}
 				return true;
 			}
 		}
 	};	
 	// north south
 	function ns(){
+		var k;
 		for(i = 0; i<$scope.gameboard.board.length; i++)
 		{
 			var playerPieces="";
@@ -102,6 +107,10 @@ app.controller('boardController', ['$scope','$firebase', function($scope, $fireb
 			}
 			if(playerPieces===$scope.gameboard.winCondition1 || playerPieces===$scope.gameboard.winCondition2)
 			{
+				for(k = 0; k<$scope.gameboard.board.length; k++)
+				{
+					$scope.gameboard.swc[k][i]=1;
+				}
 				return true;
 			}
 		}
@@ -116,6 +125,10 @@ app.controller('boardController', ['$scope','$firebase', function($scope, $fireb
 		diagonal = removeCommas(flatten(diagonal));
 		if(diagonal===$scope.gameboard.winCondition1 || diagonal===$scope.gameboard.winCondition2)
 		{
+			for(k=0; k<$scope.gameboard.board.length;k++)
+			{
+				$scope.gameboard.swc[k][k]="1";
+			}
 			return true;
 		}
 	};
@@ -132,6 +145,11 @@ app.controller('boardController', ['$scope','$firebase', function($scope, $fireb
 		diagonal = removeCommas(flatten(diagonal));
 		if(diagonal===$scope.gameboard.winCondition1 || diagonal===$scope.gameboard.winCondition2)
 		{
+			for(k=0; k<$scope.gameboard.board.length; k++)
+			{
+				var z = $scope.gameboard.board.length-1-k;
+				$scope.gameboard.swc[k][z]=1;
+			}
 			return true;
 		}
 	};
