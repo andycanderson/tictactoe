@@ -2,26 +2,26 @@ var app = angular.module('tRexToe', ["firebase"]);
 
 app.controller('boardController', ['$scope','$firebase', function($scope, $firebase){
 	
-	$scope.gameboard = {};
-	$scope.gameboard.scoreKeeper=[0,0];
-	$scope.gameboard.initiate = false;
-	$scope.gameboard.player= 1;
-	$scope.gameboard.end_game;
-	$scope.gameboard.over = false;
-	$scope.gameboard.swc = [["","",""],["","",""],["","",""]];
+	$scope.q = {};
+	$scope.q.scoreKeeper=[0,0];
+	$scope.q.initiate = false;
+	$scope.q.player= 1;
+	$scope.q.end_game;
+	$scope.q.over = false;
+	$scope.q.swc = [["","",""],["","",""],["","",""]];
 
 	
 	$scope.playAgain = function (){
-		$scope.gameboard.over = false;
-		$scope.gameboard.initiate = false;
-		$scope.gameboard.swc = [["","",""],["","",""],["","",""]];
+		$scope.q.over = false;
+		$scope.q.initiate = false;
+		$scope.q.swc = [["","",""],["","",""],["","",""]];
 	};
 
 	$scope.setupBoard = function(){
 		// var x = this.range;
 		var x = 3;
-		$scope.gameboard.playerOne = $scope.gameboard.playerOne || "Player 1";
-		$scope.gameboard.playerTwo = $scope.gameboard.playerTwo || "Player 2";
+		$scope.q.playerOne = $scope.q.playerOne || "Player 1";
+		$scope.q.playerTwo = $scope.q.playerTwo || "Player 2";
 		var board=[];
 		for(i=0; i<x; i++)
 		{
@@ -31,40 +31,40 @@ app.controller('boardController', ['$scope','$firebase', function($scope, $fireb
 				board[i][j]="";
 			}
 		}
-		$scope.gameboard.board = board;
+		$scope.q.board = board;
 		var databaseBoard = $firebase(new Firebase("https://trextoe.firebaseio.com/data"));
-		databaseBoard.$bind($scope,"gameboard");
-		$scope.gameboard.initiate = true;
-		$scope.gameboard.itsyourturn = $scope.gameboard.playerOne+"'s turn";	
-		$scope.gameboard.winCondition1 = getWinCondition(1);
-		$scope.gameboard.winCondition2 = getWinCondition(2);
+		databaseBoard.$bind($scope,"q");
+		$scope.q.initiate = true;
+		$scope.q.itsyourturn = $scope.q.playerOne+"'s turn";	
+		$scope.q.winCondition1 = getWinCondition(1);
+		$scope.q.winCondition2 = getWinCondition(2);
 	};
 
 	$scope.setPic = function(x, y){
-		if ($scope.gameboard.board[x][y]==="" && !checkWinner() && !tie())
+		if ($scope.q.board[x][y]==="" && !checkWinner() && !tie())
 		{
-			$scope.gameboard.board[x][y]=$scope.gameboard.player;
+			$scope.q.board[x][y]=$scope.q.player;
 			if (!checkWinner() && !tie()) 
 			{
 				placePieceChangeTurn();
 			}
 			else if (checkWinner())
 			{
-				$scope.gameboard.end_game = $scope.gameboard.player === 1 ? $scope.gameboard.playerOne + " wins!" : $scope.gameboard.playerTwo + " wins!";
-				$scope.gameboard.over = true;
-				$scope.gameboard.scoreKeeper[$scope.gameboard.player-1]+=1;
+				$scope.q.end_game = $scope.q.player === 1 ? $scope.q.playerOne + " wins!" : $scope.q.playerTwo + " wins!";
+				$scope.q.over = true;
+				$scope.q.scoreKeeper[$scope.q.player-1]+=1;
 			}
 			else
 			{
-				$scope.gameboard.end_game = "Tie.";
-				$scope.gameboard.over = true;
+				$scope.q.end_game = "Tie.";
+				$scope.q.over = true;
 			}
 		}
 	};
 
 	function placePieceChangeTurn(){
-		$scope.gameboard.player===2 ? $scope.gameboard.player-=1 : $scope.gameboard.player+=1;
-		$scope.gameboard.player===1 ? $scope.gameboard.itsyourturn = $scope.gameboard.playerOne+"'s turn" : $scope.gameboard.itsyourturn = $scope.gameboard.playerTwo+"'s turn";
+		$scope.q.player===2 ? $scope.q.player-=1 : $scope.q.player+=1;
+		$scope.q.player===1 ? $scope.q.itsyourturn = $scope.q.playerOne+"'s turn" : $scope.q.itsyourturn = $scope.q.playerTwo+"'s turn";
 	};
 
 	// setup logic to test the diff positions
@@ -78,15 +78,15 @@ app.controller('boardController', ['$scope','$firebase', function($scope, $fireb
 
 	// east west
 	function ew(){
-		for(i=0; i<$scope.gameboard.board.length; i++)
+		for(i=0; i<$scope.q.board.length; i++)
 		{
 
-			var row = removeCommas(flatten($scope.gameboard.board[i]));
-			if (row === $scope.gameboard.winCondition1 || row === $scope.gameboard.winCondition2)
+			var row = removeCommas(flatten($scope.q.board[i]));
+			if (row === $scope.q.winCondition1 || row === $scope.q.winCondition2)
 			{
-				for(k = 0; k<$scope.gameboard.board.length; k++)
+				for(k = 0; k<$scope.q.board.length; k++)
 				{
-					$scope.gameboard.swc[i][k]=1;
+					$scope.q.swc[i][k]=1;
 				}
 				return true;
 			}
@@ -95,21 +95,21 @@ app.controller('boardController', ['$scope','$firebase', function($scope, $fireb
 	// north south
 	function ns(){
 		var k;
-		for(i = 0; i<$scope.gameboard.board.length; i++)
+		for(i = 0; i<$scope.q.board.length; i++)
 		{
 			var playerPieces="";
-			for(j = 0; j<$scope.gameboard.board.length; j++)
+			for(j = 0; j<$scope.q.board.length; j++)
 			{
-				if($scope.gameboard.board[j][i]===$scope.gameboard.player)
+				if($scope.q.board[j][i]===$scope.q.player)
 				{
-					playerPieces=playerPieces+$scope.gameboard.player.toString();
+					playerPieces=playerPieces+$scope.q.player.toString();
 				}
 			}
-			if(playerPieces===$scope.gameboard.winCondition1 || playerPieces===$scope.gameboard.winCondition2)
+			if(playerPieces===$scope.q.winCondition1 || playerPieces===$scope.q.winCondition2)
 			{
-				for(k = 0; k<$scope.gameboard.board.length; k++)
+				for(k = 0; k<$scope.q.board.length; k++)
 				{
-					$scope.gameboard.swc[k][i]=1;
+					$scope.q.swc[k][i]=1;
 				}
 				return true;
 			}
@@ -118,16 +118,16 @@ app.controller('boardController', ['$scope','$firebase', function($scope, $fireb
 	// diagonal \
 	function senw(){
 		var diagonal=[];
-		for(i=0; i<$scope.gameboard.board.length;i++)
+		for(i=0; i<$scope.q.board.length;i++)
 		{
-			diagonal.push($scope.gameboard.board[i][i]);
+			diagonal.push($scope.q.board[i][i]);
 		}
 		diagonal = removeCommas(flatten(diagonal));
-		if(diagonal===$scope.gameboard.winCondition1 || diagonal===$scope.gameboard.winCondition2)
+		if(diagonal===$scope.q.winCondition1 || diagonal===$scope.q.winCondition2)
 		{
-			for(k=0; k<$scope.gameboard.board.length;k++)
+			for(k=0; k<$scope.q.board.length;k++)
 			{
-				$scope.gameboard.swc[k][k]="1";
+				$scope.q.swc[k][k]="1";
 			}
 			return true;
 		}
@@ -136,19 +136,19 @@ app.controller('boardController', ['$scope','$firebase', function($scope, $fireb
 	// diagonal /
 	function swne(){
 		var diagonal=[];
-		for(i=0; i<$scope.gameboard.board.length;i++)
+		for(i=0; i<$scope.q.board.length;i++)
 		{
-			var x = $scope.gameboard.board.length-1-i;
-			diagonal.push($scope.gameboard.board[i][x]);
+			var x = $scope.q.board.length-1-i;
+			diagonal.push($scope.q.board[i][x]);
 
 		}
 		diagonal = removeCommas(flatten(diagonal));
-		if(diagonal===$scope.gameboard.winCondition1 || diagonal===$scope.gameboard.winCondition2)
+		if(diagonal===$scope.q.winCondition1 || diagonal===$scope.q.winCondition2)
 		{
-			for(k=0; k<$scope.gameboard.board.length; k++)
+			for(k=0; k<$scope.q.board.length; k++)
 			{
-				var z = $scope.gameboard.board.length-1-k;
-				$scope.gameboard.swc[k][z]=1;
+				var z = $scope.q.board.length-1-k;
+				$scope.q.swc[k][z]=1;
 			}
 			return true;
 		}
@@ -156,11 +156,11 @@ app.controller('boardController', ['$scope','$firebase', function($scope, $fireb
 
 	function tie(){
 		var result; 
-		for(i = 0; i<$scope.gameboard.board.length; i++)
+		for(i = 0; i<$scope.q.board.length; i++)
 		{
-			for(j=0; j<$scope.gameboard.board.length; j++)
+			for(j=0; j<$scope.q.board.length; j++)
 			{
-				if($scope.gameboard.board[i][j]==="")
+				if($scope.q.board[i][j]==="")
 				{
 					return false;
 				}
@@ -175,7 +175,7 @@ app.controller('boardController', ['$scope','$firebase', function($scope, $fireb
 
 	function getWinCondition(player){
 		var x = "";
-		for (i = 0; i < $scope.gameboard.board.length; i++)
+		for (i = 0; i < $scope.q.board.length; i++)
 		{
 			x+=player.toString();
 		}
